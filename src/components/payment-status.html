@@ -1,0 +1,189 @@
+<!-- 
+** PAYMENT STATUS COMPONENT
+* This will be a component to show the payment status
+* Will inform whether the payment is success/failure
+* Redirected after payment page
+-->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html"> 
+
+<link rel="import" href="../components/sub-header.html">
+
+<link rel="import" href="common-styles.html">
+
+<dom-module id="payment-status">
+    <template>
+        <style include="common-styles">
+
+            .detailSec {
+                margin-bottom: 30px;
+            }
+            .detailSec div {
+                padding: 5px;
+                text-align: center;
+            }
+            .statusSec {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+            .statusSec h3 {
+                margin: 5px 0px 5px 0px;
+            }
+            .statusSec h4 {
+                margin: 10px 0px 10px 0px;
+            }
+            .actionSec{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            paper-button {
+                margin-bottom: 10px;
+            }
+        </style>
+
+        <sub-header></sub-header>
+        <div class='container fntFamily'>
+            <div class="statusSec">
+                <template is="dom-if" if="{{showSuccess}}">
+                    <image src="src/images/success/success-128x128.png" alt="success" 
+                    width="100px" height="100px">
+                    <h3 class="success-txt uppercase">{{pageValues.success}}</h3>
+                    <h4>{{pageValues.successMessage}}</h4>
+                </template>
+
+                <template is="dom-if" if="{{showError}}">
+                    <image src="src/images/error/error-128x128.png" alt="error" 
+                    width="100px" height="100px">
+                    <h3 class="error-txt uppercase">{{pageValues.failed}}</h3>
+                    <h4>{{pageValues.failureMessage}}</h4>
+                </template>
+            </div>
+
+            <div class="detailSec">
+                <div>
+                    <span>{{pageValues.transactionId}}: </span>
+                    <span>{{transactionId}}</span>
+                </div>
+                <div>
+                    <span>{{pageValues.amount}}: </span>
+                    <span>${{transactionAmount}}</span>
+                </div>
+                <div>
+                    <span>{{pageValues.transactionType}}: </span>
+                    <span>{{transactionType}}</span>
+                </div>
+                <template is="dom-if" if="[[isCategoryPresent]]">
+                    <div>
+                        <span>{{pageValues.categoryType}}: </span>
+                        <span>{{category}}</span>
+                    </div>
+                </template>
+            </div>
+
+            <div class="actionSec">
+                <app-location route="{{route}}"></app-location>
+                
+                <template is="dom-if" if="{{showSuccess}}">
+                    <paper-button class="secondaryButton button-med" nolink on-click="_navigateToPayment">
+                        {{pageValues.anotherPayment}}
+                    </paper-button>
+                </template>
+
+                <template is="dom-if" if="{{showError}}">
+                    <paper-button class="secondaryButton button-med" nolink on-click="_navigateToPayment">
+                        {{pageValues.tryAgain}}
+                    </paper-button>
+                </template>
+
+                <paper-button class="primaryButton button-med" id="transactionButton" nolink on-click="_navigateToDashboard">
+                    {{pageValues.dashboard}}
+                </paper-button>
+            </div>
+        </div>
+    </template>
+    <script>
+        class paymentStatus extends Polymer.Element {
+            static get is() { return 'payment-status' }
+            static get properties() {
+                return {
+                    showSuccess: {
+                        type: Boolean,
+                        value: true,
+                    },
+                    showError: {
+                        type: Boolean,
+                        value: false,
+                    },
+                    transactionId: {
+                        type: String,
+                        value: ''
+                    },
+                    transactionAmount: {
+                        type: String,
+                        value: ''
+                    },
+                    transactionType: {
+                        type: String,
+                        value: ''
+                    },
+                    activated: {
+                        type: Boolean,
+                        observer: '_activationChanged'
+                    },
+                    category: {
+                        type: Object,
+                        value: ''
+                    },
+                    isCategoryPresent: {
+                        type: Boolean
+                    },
+                    pageValues: {
+                        type: Object
+                    }
+                }
+            }
+
+            ready() {
+                super.ready();
+            }
+
+            _getTransactionStatus() {
+                this.isCategoryPresent = false;
+                this.transactionDetails = JSON.parse(localStorage.getItem('transactionDetails'));
+                if (this.transactionDetails) {
+                    let status = this.transactionDetails;
+                    this.transactionId = status.transactionId;
+                    this.transactionType = status.paymentType;
+                    this.transactionAmount = status.amount;
+                    if (status.category.value) {
+                        this.isCategoryPresent = true;
+                        this.category = status.category.value;
+                    }
+                }
+            }
+
+            _activationChanged() {
+                
+                this._getTransactionStatus()
+            }
+
+            _navigateToPayment() {
+                this.set("route.path", "/payments");
+            }
+
+            _navigateToDashboard() {
+
+                this.set("route.path", "/dashboard");
+            }
+        }
+
+        window.customElements.define(paymentStatus.is, paymentStatus);
+    </script>
+</dom-module>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>my-view1</title>
+
+    <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../bower_components/web-component-tester/browser.js"></script>
+
+    <!-- Import the element to test -->
+    <link rel="import" href="../src/components/common-header.html">
+  </head>
+  <body>
+    <test-fixture id="commonHeader">
+      <template>
+        <common-header
+          menu = '[
+          {
+            "display" : "Payments",
+            "name"    : "payments",
+            "slug"    : "payments"
+          },
+          {
+            "display" : "Transactions",
+            "name"    : "transactions",
+            "slug"    : "transactions"                
+          },
+          {
+            "display" : "Spend Analyser",
+            "name"    : "analyser",
+            "slug"    : "analyser"                
+          }]'
+          
+        ></common-header>
+      </template>
+    </test-fixture>
+
+    <script>
+
+      suite('<common-header>', function(){
+        var commonHeader,
+        menuArray     = [
+            {
+              "display" : "Payments",
+              "name"    : "payments",
+              "slug"    : "payments"
+            },
+            {
+              "display" : "Transactions",
+              "name"    : "transactions",
+              "slug"    : "transactions"                
+            },
+            {
+              "display" : "Spend Analyser",
+              "name"    : "analyser",
+              "slug"    : "analyser"                
+            }];
+            rootPath      = "127.0.0.1:8080";
+            loggedIn      = true;
+            loggedOut     = false;
+            selected      = "payments";
+         
+        setup(function(){
+          commonHeader  = fixture('commonHeader');
+          // menuArray     = [
+          //   {
+          //     "display" : "Payments",
+          //     "name"    : "payments",
+          //     "slug"    : "payments"
+          //   },
+          //   {
+          //     "display" : "Transactions",
+          //     "name"    : "transactions",
+          //     "slug"    : "transactions"                
+          //   },
+          //   {
+          //     "display" : "Spend Analyser",
+          //     "name"    : "analyser",
+          //     "slug"    : "analyser"                
+          //   }];
+          // rootPath      = "127.0.0.1:8080";
+          // loggedIn      = true;
+          // loggedOut     = false;
+          // selected      = "payments";
+          
+          // commonHeader.menu = menuArray;
+        });
+
+/*
+//////////////////////////////////////////////////////////////////////
+
+In Setup we have intialized variables which we will need for tests
+Here we will show all paramenters <common-header> component will need
+to initiate properly for test suites
+
+  <common-header 
+    is-logged-in="{{isLoggedIn}}" 
+    menu="[[myMenu]]" 
+    root-path="[[rootPath]]" 
+    selected="[[page]]"
+    logout="[[_logout]]">
+  </common-header>
+
+//////////////////////////////////////////////////////////////////////
+*/
+
+      test('Properties are being set properly and with proper datatypes',function(){
+        commonHeader.isLoggedIn = loggedIn;
+        commonHeader.menu       = menuArray;
+        commonHeader.rootPath   = rootPath;
+        commonHeader.selected   = selected;
+
+        // commonHeader.render();
+        expect(commonHeader).to.have.a.property('isLoggedIn');
+        expect(commonHeader.isLoggedIn).to.be.a('boolean');
+        assert.equal(commonHeader.isLoggedIn , true);
+
+        expect(commonHeader).to.have.a.property('menu');
+        expect(commonHeader.menu).to.be.an('array');
+        expect(commonHeader.menu).to.not.be.empty;
+
+        expect(commonHeader).to.have.a.property('rootPath');
+        expect(commonHeader.rootPath).to.be.a('string');
+        assert.equal(commonHeader.rootPath , "127.0.0.1:8080");        
+
+        expect(commonHeader).to.have.a.property('selected');
+        expect(commonHeader.selected).to.be.a('string');
+        assert.equal(commonHeader.selected , "payments");
+      });
+
+        // test('Logged in status received from parent as property properly', function(){
+        //   commonHeader.isLoggedIn = loggedIn;
+        //   expect(commonHeader).to.have.a.property('isLoggedIn');
+        //   expect(commonHeader.isLoggedIn).to.be.a('boolean');
+        //   assert.equal(commonHeader.isLoggedIn , true);
+        // });
+
+        // test('Menu Items received from parent as property properly', function(){
+        //   expect(commonHeader).to.have.a.property('menu');
+        //   expect(commonHeader.menu).to.be.an('array');
+        //   expect(commonHeader.menu).to.not.be.empty;
+        // });
+
+        // test('Root Path received from parent as property properly', function(){
+        //   expect(commonHeader).to.have.a.property('rootPath');
+        //   expect(commonHeader.rootPath).to.be.a('string');
+        //   assert.equal(commonHeader.rootPath , "127.0.0.1:8080");
+        // });
+
+        // test('Page received from parent as property properly', function(){
+        //   expect(commonHeader).to.have.a.property('selected');
+        //   expect(commonHeader.selected).to.be.a('string');
+        //   assert.equal(commonHeader.selected , "payments");
+        // });
+
+        // test('Logout should visible only when user is logged in', function(done){
+        //   var logoutWrapper = commonHeader.shadowRoot.querySelectorAll('.logout-wrapper');
+        //   var logoutButton;
+          
+        //   flush(function(){
+        //     logoutButton = logoutWrapper[0].querySelector('button');
+        //     if(commonHeader.isLoggedIn){
+        //       expect(logoutButton).to.be.an.instanceof(Object); 
+        //     }
+        //     else {
+        //       expect(logoutButton).to.be.a('null');
+        //     }
+        //     done();
+        //   });
+        // });
+
+        test('Given that user is logged-in, he should able to see menu options and correct options should be visible', function(done){
+
+          commonHeader.isLoggedIn = loggedIn;
+          commonHeader.menu       = menuArray;
+          commonHeader.rootPath   = rootPath;
+          commonHeader.selected   = selected;
+
+          var menuWrapper = commonHeader.shadowRoot.querySelector('.menu-wrapper');
+          var menuLength  = commonHeader.menu.length;
+          var menuItems,displayText, i;
+
+          flush(function(){
+            menuItems = menuWrapper.getElementsByTagName('span');
+            expect(menuItems).to.have.lengthOf(menuLength);
+            for(i = 0; i< menuLength; i++){
+              displayText = menuItems[i].querySelector('a').textContent;
+              expect(displayText).to.equal(commonHeader.menu[i].display);
+            }
+            done();
+          });  
+        });
+
+        test('Given that user is logged-out, user should not be able to see menu', function(){
+          commonHeader.isLoggedIn = loggedOut;
+          commonHeader.menu       = menuArray;
+          commonHeader.rootPath   = rootPath;
+          commonHeader.selected   = selected;
+
+          var menuWrapper = commonHeader.shadowRoot.querySelector('.menu-wrapper');
+          var menuLength  = commonHeader.menu.length;
+          var menuItems,displayText, i;
+
+          flush(function(){
+            menuItems = menuWrapper.getElementsByTagName('span');
+            expect(menuItems).to.have.lengthOf(0);
+          });
+        });       
+      });
+    </script>
+  </body>
+</html>
